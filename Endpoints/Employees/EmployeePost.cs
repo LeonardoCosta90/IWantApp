@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 
@@ -9,6 +10,7 @@ public class EmployeePost
   public static string[] Methods => new string[] { HttpMethod.Post.ToString() };
   public static Delegate Handle => Action;
 
+  [Authorize(Policy = "EmployeePolicy")]
   public static IResult Action(EmployeeRequest employeeRequest, UserManager<IdentityUser> userManager)
   {
     var user = new IdentityUser { UserName = employeeRequest.Email, Email = employeeRequest.Email };

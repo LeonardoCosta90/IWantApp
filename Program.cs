@@ -3,6 +3,7 @@ using IWantApp.Endpoints.Employees;
 using IWantApp.Endpoints.Security;
 using IWantApp.Infra.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -19,7 +20,15 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
   options.Password.RequiredLength = 3;
 }).AddEntityFrameworkStores<ApplicationDbContext>();
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+  options.FallbackPolicy = new AuthorizationPolicyBuilder()
+    .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+    .RequireAuthenticatedUser()
+    .Build();
+  options.AddPolicy("EmployeePolicy", p =>
+      p.RequireAuthenticatedUser().RequireClaim("EmployeeCode"));
+});
 builder.Services.AddAuthentication(x =>
 {
   x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -33,7 +42,8 @@ builder.Services.AddAuthentication(x =>
     ValidateIssuer = true,
     ValidateLifetime = true,
     ValidateIssuerSigningKey = true,
-    ValidIssuer = "Issuer2", //builder.Configuration["JwtBearerTokenSettings:Issuer"],
+    ClockSkew = TimeSpan.Zero,
+    ValidIssuer = builder.Configuration["JwtBearerTokenSettings:Issuer"],
     ValidAudience = builder.Configuration["JwtBearerTokenSettings:Audience"],
     IssuerSigningKey = new SymmetricSecurityKey(
           Encoding.UTF8.GetBytes(builder.Configuration["JwtBearerTokenSettings:SecretKey"]))
@@ -54,7 +64,9 @@ if (app.Environment.IsDevelopment())
   app.UseSwagger();
   app.UseSwaggerUI();
 }
+
 app.UseHttpsRedirection();
+
 app.MapMethods(CategoryPost.Template, CategoryPost.Methods, CategoryPost.Handle);
 app.MapMethods(CategoryGetAll.Template, CategoryGetAll.Methods, CategoryGetAll.Handle);
 app.MapMethods(CategoryPut.Template, CategoryPut.Methods, CategoryPut.Handle);
