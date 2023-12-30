@@ -1,12 +1,9 @@
 using Flunt.Validations;
-
 namespace IWantApp.Domain.Products;
-
 public class Category : Entity
 {
   public string Name { get; private set; }
   public bool Active { get; private set; }
-
   public Category(string name, string createdBy, string editedBy)
   {
     Name = name;
@@ -15,10 +12,8 @@ public class Category : Entity
     EditedBy = editedBy;
     CreatedOn = DateTime.Now;
     EditedOn = DateTime.Now;
-
     Validate();
   }
-
   private void Validate()
   {
     var contract = new Contract<Category>()
@@ -29,10 +24,12 @@ public class Category : Entity
     AddNotifications(contract);
   }
 
-  public void EditInfo(string name, bool active)
+  public void EditInfo(string name, bool active, string editedBy)
   {
     Active = active;
     Name = name;
+    EditedBy = editedBy;
+    EditedOn = DateTime.Now;
 
     Validate();
   }
