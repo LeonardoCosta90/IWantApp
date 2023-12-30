@@ -1,7 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using System.Security.Claims;
-
 namespace IWantApp.Endpoints.Employees;
 
 public class EmployeePost

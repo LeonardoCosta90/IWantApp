@@ -1,6 +1,3 @@
-using IWantApp.Infra.Data;
-using Microsoft.AspNetCore.Authorization;
-
 namespace IWantApp.Endpoints.Categories;
 
 public class CategoryGetAll
