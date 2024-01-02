@@ -1,10 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-
 namespace IWantApp.Endpoints.Security;
 
 public class TokenPost
@@ -14,8 +7,10 @@ public class TokenPost
   public static Delegate Handle => Action;
 
   [AllowAnonymous]
-  public static async Task<IResult> Action(LoginRequest loginRequest, IConfiguration configuration, UserManager<IdentityUser> userManager)
+  public static async Task<IResult> Action(
+        LoginRequest loginRequest, IConfiguration configuration, UserManager<IdentityUser> userManager, ILogger<TokenPost> log)
   {
+    log.LogInformation("Getting token");
     var user = await userManager.FindByEmailAsync(loginRequest.Email);
     if (user == null)
       Results.BadRequest();
