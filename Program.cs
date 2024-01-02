@@ -1,8 +1,22 @@
 using Microsoft.AspNetCore.Diagnostics;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSqlServer<ApplicationDbContext>(
     builder.Configuration["ConnectionString:IWantDb"]);
+builder.WebHost.UseSerilog((context, configuration) =>
+{
+  configuration
+      .WriteTo.Console()
+      .WriteTo.MSSqlServer(
+          context.Configuration["ConnectionString:IWantDb"],
+            sinkOptions: new Serilog.Sinks.MSSqlServer.MSSqlServerSinkOptions()
+            {
+              AutoCreateSqlTable = true,
+              TableName = "LogAPI"
+            });
+});
+
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
   options.Password.RequireNonAlphanumeric = false;
